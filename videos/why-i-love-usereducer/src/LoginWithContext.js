@@ -1,39 +1,38 @@
-import React, { useContext } from 'react';
-import { useImmerReducer } from 'use-immer';
-import { login } from './utils';
+import React, { useContext, useReducer } from "react";
+import { login } from "./utils";
 
 function loginReducer(draft, action) {
   switch (action.type) {
-    case 'field': {
+    case "field": {
       draft[action.fieldName] = action.payload;
       return;
     }
-    case 'login': {
-      draft.error = '';
+    case "login": {
+      draft.error = "";
       draft.isLoading = true;
       return;
     }
-    case 'success': {
+    case "success": {
       draft.isLoggedIn = true;
       draft.isLoading = false;
-      draft.username = '';
-      draft.password = '';
+      draft.username = "";
+      draft.password = "";
       return;
     }
-    case 'error': {
-      draft.error = 'Incorrect username or password!';
+    case "error": {
+      draft.error = "Incorrect username or password!";
       draft.isLoggedIn = false;
       draft.isLoading = false;
-      draft.username = '';
-      draft.password = '';
+      draft.username = "";
+      draft.password = "";
       return;
     }
-    case 'logOut': {
+    case "logOut": {
       draft.isLoggedIn = false;
       return;
     }
-    case 'toggleTodoCompleted': {
-      const todo = draft.todos.find((item) => item.title === action.payload);
+    case "toggleTodoCompleted": {
+      const todo = draft.todos.find(item => item.title === action.payload);
       todo.completed = !todo.completed;
       return;
     }
@@ -44,91 +43,91 @@ function loginReducer(draft, action) {
 
 const todos = [
   {
-    title: 'Get milk',
-    completed: true,
+    title: "Get milk",
+    completed: true
   },
   {
-    title: 'Make YouTube video',
-    completed: false,
+    title: "Make YouTube video",
+    completed: false
   },
   {
-    title: 'Write blog post',
-    completed: false,
-  },
+    title: "Write blog post",
+    completed: false
+  }
 ];
 
 const initialState = {
-  username: '',
-  password: '',
+  username: "",
+  password: "",
   isLoading: false,
-  error: '',
+  error: "",
   isLoggedIn: false,
-  todos,
+  todos
 };
 
 const StateContext = React.createContext();
 const DispatchContext = React.createContext();
 
 export default function LoginUseContext() {
-  const [state, dispatch] = useImmerReducer(loginReducer, initialState);
+  const [state, dispatch] = useReducer(loginReducer, initialState);
   const { username, password, isLoading, error, isLoggedIn, todos } = state;
 
-  const onSubmit = async (e) => {
+  const onSubmit = async e => {
     e.preventDefault();
 
-    dispatch({ type: 'login' });
+    dispatch({ type: "login" });
 
     try {
       await login({ username, password });
-      dispatch({ type: 'success' });
+      dispatch({ type: "success" });
     } catch (error) {
-      dispatch({ type: 'error' });
+      dispatch({ type: "error" });
     }
   };
 
   return (
     <DispatchContext.Provider value={dispatch}>
       <StateContext.Provider value={state}>
-        <div className='App useContext'>
-          <div className='login-container'>
+        <div className="App useContext">
+          <div className="login-container">
             {isLoggedIn ? (
               <>
                 <h1>Welcome {username}!</h1>
-                <button onClick={() => dispatch({ type: 'logOut' })}>
+                <button onClick={() => dispatch({ type: "logOut" })}>
                   Log Out
                 </button>
               </>
             ) : (
-              <form className='form' onSubmit={onSubmit}>
-                {error && <p className='error'>{error}</p>}
+              <form className="form" onSubmit={onSubmit}>
+                {error && <p className="error">{error}</p>}
                 <p>Please Login!</p>
                 <input
-                  type='text'
-                  placeholder='username'
+                  type="text"
+                  placeholder="username"
                   value={username}
-                  onChange={(e) =>
+                  onChange={e =>
                     dispatch({
-                      type: 'field',
-                      fieldName: 'username',
-                      payload: e.currentTarget.value,
+                      type: "field",
+                      fieldName: "username",
+                      payload: e.currentTarget.value
                     })
                   }
                 />
                 <input
-                  type='password'
-                  placeholder='password'
-                  autoComplete='new-password'
+                  type="password"
+                  placeholder="password"
+                  autoComplete="new-password"
                   value={password}
-                  onChange={(e) =>
+                  onChange={e =>
                     dispatch({
-                      type: 'field',
-                      fieldName: 'password',
-                      payload: e.currentTarget.value,
+                      type: "field",
+                      fieldName: "password",
+                      payload: e.currentTarget.value
                     })
                   }
                 />
-                <button className='submit' type='submit' disabled={isLoading}>
-                  {isLoading ? 'Logging in...' : 'Log In'}
+                <button className="submit" type="submit" disabled={isLoading}>
+                  {isLoading ? "Logging in..." : "Log In"}
                 </button>
               </form>
             )}
@@ -143,9 +142,9 @@ export default function LoginUseContext() {
 
 function TodoPage({ todos }) {
   return (
-    <div className='todoContainer'>
+    <div className="todoContainer">
       <h2>Todos</h2>
-      {todos.map((item) => (
+      {todos.map(item => (
         <TodoItem key={item.title} {...item} />
       ))}
     </div>
@@ -158,20 +157,20 @@ function TodoItem({ title, completed }) {
   // const { isLoggedIn } = state;
   const isLoggedIn = true;
   return (
-    <div className='todoItem'>
+    <div className="todoItem">
       <p>{title}</p>
       <div>
         <input
-          type='checkbox'
+          type="checkbox"
           checked={completed}
           onClick={() => {
             if (!isLoggedIn) {
-              alert('Please login to click this!');
+              alert("Please login to click this!");
             }
           }}
           onChange={() => {
             if (isLoggedIn) {
-              dispatch({ type: 'toggleTodoCompleted', payload: title });
+              dispatch({ type: "toggleTodoCompleted", payload: title });
             }
           }}
         />
